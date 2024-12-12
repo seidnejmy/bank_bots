@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,29 +12,67 @@
             padding: 0;
             background-color: #fff;
             color: #000;
+            display: flex;
+            height: 100vh; /* Full viewport height */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
         }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #5c007a;
+            color: #fff;
+            padding: 10px 20px;
+            width: 100%;
+            position: fixed; /* Fixed header */
+            top: 0;
+            left: 0;
+            z-index: 1000; /* Ensure it is above other content */
+            transition: background-color 0.3s; /* Smooth transition for header */
+        }
+
+        .sidebar {
+            width: 250px; /* Fixed width for the sidebar */
+            padding: 20px;
+            background-color: #f4f4f4; /* Light background color for light mode */
+            border-right: 1px solid #ccc; /* Add border on the right side */
+            margin-top: 80px; /* Margin to avoid overlap with the header */
+            overflow-y: auto; /* Allow scrolling if content exceeds height */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
+        }
+
         #chat-container {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin: 20px auto;
-            max-width: 600px;
-            background-color: #f9f9f9;
+            padding: 20px; /* Padding inside the chat container */
+            background-color: #f9f9f9; /* Light background for chat */
             border-radius: 8px;
+            flex-grow: 1; /* Take the remaining width of the flex container */
+            margin-top: 80px; /* Margin to avoid overlap with the header */
+            margin-left: 20px; /* Space from the sidebar */
+            margin-right: 20px; /* Space from the right edge */
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s; /* Smooth transition for dark mode */
         }
+
         #messages {
             overflow-y: auto;
-            max-height: 300px;
+            max-height: 300px; /* Maximum height for message area */
             border: 1px solid #ccc;
             padding: 10px;
-            background-color: #fff;
+            background-color: #fff; /* Light messages background */
             border-radius: 5px;
+            flex-grow: 1; /* Allow messages to fill available space */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
         }
+
         #user-input {
-            width: 80%;
+            width: 80%; /* Width for the input box */
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         #send-button {
             padding: 8px 15px;
             background-color: #0078d7;
@@ -42,9 +81,11 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         #send-button:hover {
             background-color: #005bb5;
         }
+
         #language-selector button {
             margin: 5px;
             padding: 8px 15px;
@@ -53,9 +94,11 @@
             cursor: pointer;
             background-color: #f0f0f0;
         }
+
         #language-selector button:hover {
             background-color: #ddd;
         }
+
         #dark-mode-button {
             margin: 10px;
             padding: 8px 15px;
@@ -65,23 +108,94 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         #dark-mode-button:hover {
             background-color: #555;
         }
+
+        .sidebar img {
+            width: 100%;
+            border-radius: 50%;
+        }
+
+        .sidebar .name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .sidebar .description {
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+
+        body.dark-mode header {
+            background-color: #4a0072; /* Darker header */
+        }
+
+        body.dark-mode .sidebar {
+            background-color: #444; /* Dark sidebar */
+            color: #fff;
+        }
+
+        body.dark-mode #chat-container {
+            background-color: #555; /* Dark chat container */
+        }
+
+        body.dark-mode #messages {
+            background-color: #444; /* Dark messages area */
+            border: 1px solid #666; /* Darker border */
+        }
+
+        body.dark-mode #user-input {
+            background-color: #666; /* Dark input background */
+            color: #fff; /* Light text in input */
+        }
+
+        body.dark-mode #send-button {
+            background-color: #0084ff; /* Button in dark mode */
+            color: #fff;
+        }
     </style>
 </head>
+
 <body>
-    <button id="back-button">Back</button>
-    <button id="dark-mode-button" style="float: right;">Dark Mode</button>
-    <h1 style="text-align: center;">GasheAI</h1>
-    <div id="language-selector" style="text-align: center;">
-        <button data-lang="en">English</button>
-        <button data-lang="am">Amharic</button>
-        <button data-lang="om">Oromo</button>
-        <button data-lang="so">Somali</button>
-        <button data-lang="ti">Tigrinya</button>
+    <header>
+        <div class="logo">
+            <img src="https://gasheai.nehabi.com/extensions/uploads/sites/561/elementor/thumbs/retina-logopng-1-qy3asku6q0pnm2u2c512h2jgfmdljytp8mk7zm58dq.png" alt="Logo">
+            <span>GasheAI</span>
+        </div>
+        <nav>
+            <a href="https://gasheai.nehabi.com/">Home</a>
+            <a href="https://gasheai.nehabi.com/servicesnejmy/">About</a>
+            <a href="https://gasheai.nehabi.com/servicesnejmy/">Services</a>
+        </nav>
+        <a href="#" class="cta-button">Click here</a>
+    </header>
+    <div class="sidebar">
+        <img src="https://via.placeholder.com/150" alt="Profile Photo">
+        <div class="name">John Doe</div>
+        <div class="description">This is a description about the user or assistant. It can include their role, purpose, or any relevant details.</div>
     </div>
     <div id="chat-container">
+        <button id="back-button">Back</button>
+        <button id="dark-mode-button" style="float: right;">Dark Mode</button>
+        <h1 style="text-align: center;">GasheAI</h1>
+        <div id="language-selector" style="text-align: center;">
+            <button data-lang="en">English</button>
+            <button data-lang="am">Amharic</button>
+            <button data-lang="om">Oromo</button>
+            <button data-lang="so">Somali</button>
+            <button data-lang="ti">Tigrinya</button>
+        </div>
         <div id="messages"></div>
         <div style="margin-top: 10px; text-align: center;">
             <input id="user-input" type="text" placeholder="Type your message here...">
@@ -146,7 +260,7 @@
             const requestBody = {
                 model: model,
                 messages: [
-                    { role: "system", content: "You are GasheAI, the assistant trained to help Ethiopians in five native languages, Amharic, Oromo. Somali, Tigringa, Affari. Your is to give answers to any of their uestion in a politr freindly manner." },
+                    { role: "system", content: "You are GasheAI, the assistant trained to help Ethiopians in five native languages, Amharic, Oromo. Somali, Tigringa, Affari. Your role is to give answers to any of their questions in a polite friendly manner." },
                     { role: "user", content: message }
                 ],
                 max_tokens: 150
@@ -208,10 +322,10 @@
 
         // Dark mode toggle functionality
         document.getElementById("dark-mode-button").addEventListener("click", () => {
-            darkMode = !darkMode;
-            document.body.style.backgroundColor = darkMode ? "#333" : "#fff";
-            document.body.style.color = darkMode ? "#fff" : "#000";
+            darkMode = !darkMode; // Toggle dark mode state
+            document.body.classList.toggle("dark-mode", darkMode); // Add or remove dark mode class
         });
     </script>
 </body>
+
 </html>
