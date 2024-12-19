@@ -412,6 +412,17 @@
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendButton.click();
     });
+    
+    window.addEventListener('message', (event) => {
+    if (event.data === 'closeModal') {
+        // Assuming you're using Elementor's modal system
+        const modal = document.querySelector('.elementor-modal'); // Adjust this selector to match your modal element
+        if (modal) {
+            modal.style.display = 'none'; // Close the modal
+        }
+    }
+});
+
 </script>
 
 
