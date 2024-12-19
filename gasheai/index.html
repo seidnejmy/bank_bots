@@ -1,342 +1,410 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Chat with Ethio Telecom Assistant</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #fff;
-            color: #000;
+            background-color: #F2DBE1;
+            color: #333;
+            line-height: 1.6;
             display: flex;
-            height: 100vh; /* Full viewport height */
-            transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #5c007a;
-            color: #fff;
-            padding: 10px 20px;
-            width: 100%;
-            position: fixed; /* Fixed header */
-            top: 0;
-            left: 0;
-            z-index: 1000; /* Ensure it is above other content */
-            transition: background-color 0.3s; /* Smooth transition for header */
+        .dark-mode {
+            background-color: #333;
+            color: #f2f2f2;
         }
 
-        .sidebar {
-            width: 250px; /* Fixed width for the sidebar */
+        #sidebar {
+            width: 250px;
+            background-color: #7D0B8E;
             padding: 20px;
-            background-color: #f4f4f4; /* Light background color for light mode */
-            border-right: 1px solid #ccc; /* Add border on the right side */
-            margin-top: 80px; /* Margin to avoid overlap with the header */
-            overflow-y: auto; /* Allow scrolling if content exceeds height */
-            transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s;
+        }
+
+        .dark-mode #sidebar {
+            background-color: #444;
+        }
+
+        #back-button {
+            background-color: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        #sidebar img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        #sidebar h2, #sidebar p {
+            color: #fff;
+        }
+
+        .dark-mode #sidebar h2, .dark-mode #sidebar p {
+            color: #f2f2f2;
+        }
+
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #header {
+            background-color: #9118AC;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s;
+        }
+
+        .dark-mode #header {
+            background-color: #444;
+        }
+
+        #header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        #header-buttons button {
+            margin-left: 15px;
+            background-color: #fff;
+            color: #d45732;
+            border: none;
+            padding: 10px 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .dark-mode #header-buttons button {
+            background-color: #555;
+            color: #fff;
         }
 
         #chat-container {
-            padding: 20px; /* Padding inside the chat container */
-            background-color: #f9f9f9; /* Light background for chat */
-            border-radius: 8px;
-            flex-grow: 1; /* Take the remaining width of the flex container */
-            margin-top: 80px; /* Margin to avoid overlap with the header */
-            margin-left: 20px; /* Space from the sidebar */
-            margin-right: 20px; /* Space from the right edge */
             display: flex;
             flex-direction: column;
-            transition: background-color 0.3s; /* Smooth transition for dark mode */
-        }
-
-        #messages {
+            height: calc(100vh - 230px);
+            padding: 20px;
             overflow-y: auto;
-            max-height: 300px; /* Maximum height for message area */
-            border: 1px solid #ccc;
-            padding: 10px;
-            background-color: #fff; /* Light messages background */
-            border-radius: 5px;
-            flex-grow: 1; /* Allow messages to fill available space */
-            transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
+            background-color: #fff;
+            border-top: 1px solid #d45732;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        #user-input {
-            width: 80%; /* Width for the input box */
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .dark-mode #chat-container {
+            background-color: #222;
+            color: #f2f2f2;
         }
 
-        #send-button {
-            padding: 8px 15px;
-            background-color: #0078d7;
+        .message {
+            margin: 10px 0;
+            padding: 12px 15px;
+            border-radius: 12px;
+            max-width: 70%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            text-align: right;
+            background-color: #ff8c00;
             color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
 
-        #send-button:hover {
-            background-color: #005bb5;
-        }
-
-        #language-selector button {
-            margin: 5px;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #f0f0f0;
-        }
-
-        #language-selector button:hover {
-            background-color: #ddd;
-        }
-
-        #dark-mode-button {
-            margin: 10px;
-            padding: 8px 15px;
-            background-color: #333;
+        .message.bot {
+            align-self: flex-start;
+            text-align: left;
+            background-color: #d45732;
             color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
 
-        #dark-mode-button:hover {
+        .dark-mode .message.user {
+            background-color: #888;
+        }
+
+        .dark-mode .message.bot {
             background-color: #555;
         }
 
-        .sidebar img {
+        #input-area {
+            position: fixed;
+            bottom: 0;
             width: 100%;
-            border-radius: 50%;
+            padding: 15px 20px;
+            background-color: #fff;
+            border-top: 1px solid #d45732;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background-color 0.3s;
         }
 
-        .sidebar .name {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 10px;
-            text-align: center;
+        .dark-mode #input-area {
+            background-color: #444;
         }
 
-        .sidebar .description {
+        #message-input {
+            flex: 1;
+            padding: 12px 15px;
             font-size: 14px;
-            margin-top: 10px;
-            text-align: center;
+            border: 1px solid #d45732;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            background-color: #f2f2f2;
+            color: #333;
         }
 
-        /* Dark mode styles */
-        body.dark-mode {
-            background-color: #333;
+        .dark-mode #message-input {
+            background-color: #666;
+            color: #f2f2f2;
+            border-color: #888;
+        }
+
+        #send-button {
+            background-color: #ff8c00;
             color: #fff;
+            border: none;
+            padding: 10px 18px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        body.dark-mode header {
-            background-color: #4a0072; /* Darker header */
+        .dark-mode #send-button {
+            background-color: #555;
         }
 
-        body.dark-mode .sidebar {
-            background-color: #444; /* Dark sidebar */
-            color: #fff;
+        #language-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            background-color: #f2f2f2;
+            position: fixed;
+            bottom: 60px;
+            width: 100%;
+            z-index: 10;
         }
 
-        body.dark-mode #chat-container {
-            background-color: #555; /* Dark chat container */
+        .dark-mode #language-buttons {
+            background-color: #444;
         }
 
-        body.dark-mode #messages {
-            background-color: #444; /* Dark messages area */
-            border: 1px solid #666; /* Darker border */
+        #language-buttons button {
+            padding: 8px 12px;
+            border: 1px solid #d45732;
+            cursor: pointer;
+            background-color: #fff;
+            color: #d45732;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        body.dark-mode #user-input {
-            background-color: #666; /* Dark input background */
-            color: #fff; /* Light text in input */
+        .dark-mode #language-buttons button {
+            background-color: #555;
+            color: #f2f2f2;
         }
 
-        body.dark-mode #send-button {
-            background-color: #0084ff; /* Button in dark mode */
-            color: #fff;
+        #language-buttons button.active {
+            background-color: #d45732;
+            color: white;
+            border-color: #d45732;
         }
+
+        .dark-mode #language-buttons button.active {
+            background-color: #888;
+        }
+
         @media (max-width: 768px) {
-    .sidebar {
-        display: none; /* Hide sidebar on smaller screens */
-    }
+            #sidebar {
+                display: none;
+            }
 
-    #chat-container {
-        margin-left: 0; /* Adjust chat container margin when sidebar is hidden */
-        margin-right: 0; /* Ensure it takes full width */
-    }
-}
+            #main-content {
+                width: 100%;
+            }
 
-
-    
-    
-    
-    
+            #chat-container {
+                height: calc(100vh - 180px);
+            }
+        }
     </style>
 </head>
-
 <body>
-    <header>
-        <div class="logo">
-            <img src="https://gasheai.nehabi.com/extensions/uploads/sites/561/elementor/thumbs/retina-logopng-1-qy3asku6q0pnm2u2c512h2jgfmdljytp8mk7zm58dq.png" alt="Logo">
-            <span>GasheAI</span>
-        </div>
-    </header>
-    <div class="sidebar">
-        <img src="https://via.placeholder.com/150" alt="Profile Photo">
-        <div class="name">John Doe</div>
-        <div class="description">This is a description about the user or assistant. It can include their role, purpose, or any relevant details.</div>
-    </div>
-    <div id="chat-container">
+    <div id="sidebar">
         <button id="back-button">Back</button>
-        <button id="dark-mode-button" style="float: right;">Dark Mode</button>
-        <h1 style="text-align: center;">GasheAI</h1>
-        <div id="language-selector" style="text-align: center;">
-            <button data-lang="en">English</button>
-            <button data-lang="am">Amharic</button>
-            <button data-lang="om">Oromo</button>
-            <button data-lang="so">Somali</button>
-            <button data-lang="ti">Tigrinya</button>
-            <button data-lang="af">Afar</button>
+        <img src="https://via.placeholder.com/250" alt="Placeholder Photo">
+        <h2>GasheAI</h2>
+        <p>Explore the art of cooking with our expert guidance and delicious recipes.</p>
+    </div>
+    <div id="main-content">
+        <div id="header">
+            <h1>Chat with GasheAI</h1>
+            <div id="header-buttons">
+                <button id="new-chat-button">New Chat</button>
+                <button id="dark-mode-toggle">Enable Dark Mode</button>
+            </div>
         </div>
-        <div id="messages"></div>
-        <div style="margin-top: 10px; text-align: center;">
-            <input id="user-input" type="text" placeholder="Type your message here...">
+        <div id="chat-container"></div>
+        <div id="language-buttons">
+            <button id="en-button" class="active">English</button>
+            <button id="am-button">Amharic</button>
+            <button id="om-button">Oromo</button>
+            <button id="so-button">Somali</button>
+            <button id="ti-button">Tigrigna</button>
+            <button id="aa-button">Afar</button>
+        </div>
+        <div id="input-area">
+            <input type="text" id="message-input" placeholder="Type your message here...">
             <button id="send-button">Send</button>
         </div>
     </div>
-    <script>
-        const apiKey = "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";
-        const model = "llama3-groq-70b-8192-tool-use-preview";
-        const apiEndpoint = "https://api.groq.com/openai/v1/chat/completions";
-        let selectedLanguage = "en"; // Default language is English
-        let darkMode = false; // Track dark mode state
+</body>
+</html>
 
-        const messagesDiv = document.getElementById("messages");
-        const userInput = document.getElementById("user-input");
-        const sendButton = document.getElementById("send-button");
-        const languageButtons = document.querySelectorAll("#language-selector button");
+<script>
+    const chatContainer = document.getElementById('chat-container');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const languageButtons = document.getElementById('language-buttons');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const newChatButton = document.getElementById('new-chat-button');
+    let currentLanguage = 'en';
+    let isDarkMode = false;
 
-        // Language selection logic
-        languageButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                selectedLanguage = button.dataset.lang;
-                languageButtons.forEach(btn => btn.style.backgroundColor = ""); // Reset styles
-                button.style.backgroundColor = "#0078d7"; // Highlight selected language
-                messagesDiv.innerHTML = ""; // Clear messages on language change
-            });
-        });
+    const API_KEY = "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"; // Replace with your actual API key
+    const MODEL = "llama3-groq-70b-8192-tool-use-preview";
+    const TRANSLATION_API_URL = "https://translate.googleapis.com/translate_a/single";
 
-        // Append messages to chat container
-        function appendMessage(message, sender, typingEffect = false) {
-            const messageDiv = document.createElement("div");
-            messageDiv.style.margin = "5px 0";
-            messageDiv.style.color = sender === "You" ? "#0078d7" : "#000";
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    let chatHistory = []; // Store the chat history here
 
-            if (typingEffect) {
-                let index = 0;
-                const interval = setInterval(() => {
-                    if (index < message.length) {
-                        messageDiv.textContent += message[index];
-                        index++;
-                    } else {
-                        clearInterval(interval);
-                    }
-                }, 5); // 10 characters per second (100ms per character)
-            } else {
-                messageDiv.textContent = `${sender}: ${message}`;
-            }
+    // Toggle Dark Mode
+    darkModeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        isDarkMode = !isDarkMode;
+        darkModeToggle.textContent = isDarkMode ? 'Disable Dark Mode' : 'Enable Dark Mode';
+    });
+
+    // New Chat
+    newChatButton.addEventListener('click', () => {
+        chatContainer.innerHTML = '';
+        messageInput.value = '';
+        chatHistory = []; // Reset chat history
+    });
+
+    // Language selection
+    languageButtons.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            currentLanguage = e.target.id.split('-')[0];
+            document.querySelectorAll('#language-buttons button').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
         }
+    });
 
-        // Google Translate unofficial API
-        async function translateText(text, targetLang) {
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data[0][0][0]; // Return translated text
-        }
+// Translate text using Google Translate API
+async function translateText(text, targetLang) {
+    if (targetLang === 'en') return text; // Skip translation if the target language is English
 
-        // GROQ API for assistant response
-        async function getAssistantResponse(message) {
-            const requestBody = {
-                model: model,
-                messages: [
-                    { role: "system", content: "You are GasheAI, the assistant trained to help Ethiopians in five native languages, Amharic, Oromo. Somali, Tigringa, Affari. Your role is to give answers to any of their questions in a polite friendly manner." },
-                    { role: "user", content: message }
-                ],
-                max_tokens: 150
-            };
+    const url = `${TRANSLATION_API_URL}?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Translation API error: ' + response.statusText);
 
-            const response = await fetch(apiEndpoint, {
+        const data = await response.json();
+        
+        // Combine all parts of the translated response
+        // Ensure full translation is returned without splitting by punctuation
+        return data[0].map(part => part[0]).join(''); 
+    } catch (error) {
+        console.error('Translation error:', error);
+        return text; // Return the original text if translation fails
+    }
+}
+
+    // Send message
+    sendButton.addEventListener('click', async () => {
+        const userMessage = messageInput.value.trim();
+        if (!userMessage) return;
+
+        // Display user message
+        chatContainer.innerHTML += `<div class="message user">${userMessage}</div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        messageInput.value = '';
+
+        // Translate user message to English
+        const translatedMessage = await translateText(userMessage, 'en');
+
+        // Add user message to chat history
+        chatHistory.push({ role: "user", content: translatedMessage });
+
+        // Send chat history to AI
+        try {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${apiKey}`
+                    "Authorization": `Bearer ${API_KEY}`
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify({
+                    model: MODEL,
+                    messages: [
+                        { role: "system", content: "You are Gashe, my personal assistant. You provide helpful, friendly, and concise responses to any query." },
+                        ...chatHistory // Include full chat history
+                    ]
+                })
             });
 
             if (!response.ok) {
-                throw new Error(`API error: ${response.status} ${response.statusText}`);
+                throw new Error('Network response was not ok: ' + response.statusText);
             }
 
             const data = await response.json();
-            return data.choices[0].message.content;
+            let aiResponse = data.choices[0].message.content;
+
+            // Translate AI response to the current language
+            aiResponse = await translateText(aiResponse, currentLanguage);
+
+            // Display AI response
+            chatContainer.innerHTML += `<div class="message bot">Gashe: ${aiResponse}</div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Add bot response to chat history
+            chatHistory.push({ role: "assistant", content: aiResponse });
+
+        } catch (error) {
+            console.error('Error sending message:', error);
+            chatContainer.innerHTML += `<div class="message bot">Error: ${error.message}</div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
+    });
 
-        // Message sending logic
-        async function sendMessage() {
-            const userMessage = userInput.value.trim();
-            if (!userMessage) return;
+    // Allow "Enter" to send the message
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendButton.click();
+    });
+</script>
 
-            appendMessage(userMessage, "You");
-            userInput.value = "";
 
-            try {
-                // Translate user input to English
-                const translatedMessage = await translateText(userMessage, "en");
-
-                // Get assistant response
-                const assistantResponse = await getAssistantResponse(translatedMessage);
-
-                // Translate assistant response to selected language
-                const translatedResponse = await translateText(assistantResponse, selectedLanguage);
-
-                // Append assistant's response with typing effect
-                appendMessage(translatedResponse, "Assistant", true);
-            } catch (error) {
-                console.error("Error:", error);
-                appendMessage("An error occurred while processing your message.", "Assistant");
-            }
-        }
-
-        // Event listeners for sending messages
-        sendButton.addEventListener("click", sendMessage);
-        userInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendMessage();
-        });
-
-        // Back button functionality
-        document.getElementById("back-button").addEventListener("click", () => {
-            window.history.back(); // Navigate to the previous page
-        });
-
-        // Dark mode toggle functionality
-        document.getElementById("dark-mode-button").addEventListener("click", () => {
-            darkMode = !darkMode; // Toggle dark mode state
-            document.body.classList.toggle("dark-mode", darkMode); // Add or remove dark mode class
-        });
-    </script>
 </body>
-
 </html>
