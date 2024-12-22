@@ -295,9 +295,9 @@
     const darkModeToggle = document.getElementById('dark-mode-toggle');
     const newChatButton = document.getElementById('new-chat-button');
     const backButton = document.getElementById('back-button');
-
     let currentLanguage = 'en';
     let isDarkMode = false;
+
     const API_KEY = "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"; // Replace with your actual API key
     const MODEL = "llama3-groq-70b-8192-tool-use-preview";
     const TRANSLATION_API_URL = "https://translate.googleapis.com/translate_a/single";
@@ -320,8 +320,7 @@
 
     // Handle Back Button
     backButton.addEventListener('click', () => {
-        const isInIframe = window.top !== window.self;
-        if (isInIframe) {
+        if (window.top !== window.self) {
             window.top.postMessage('closeModal', '*'); // Close modal if in iframe
         } else {
             window.location.href = 'https://gasheai.nehabi.com/';
@@ -334,8 +333,6 @@
             currentLanguage = e.target.id.split('-')[0];
             document.querySelectorAll('#language-buttons button').forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
-            chatContainer.innerHTML = ''; // Clear chat history
-            chatHistory = [];
         }
     });
 
@@ -368,6 +365,8 @@
 
         // Translate user message to English
         const translatedMessage = await translateText(userMessage, 'en');
+
+        // Add user message to chat history
         chatHistory.push({ role: "user", content: translatedMessage });
 
         // Send chat history to AI
@@ -415,19 +414,18 @@
                 })
             });
 
-            if (!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
 
             const data = await response.json();
             let aiResponse = data.choices[0].message.content;
 
-            // Format response in Markdown
-            aiResponse = `**COOPBot:**\n\n${aiResponse.replace(/\n/g, '\n\n')}`;
-
-            // Translate AI response to current language
+            // Translate AI response to the current language
             aiResponse = await translateText(aiResponse, currentLanguage);
 
             // Display AI response
-            chatContainer.innerHTML += `<div class="message bot">${aiResponse}</div>`;
+            chatContainer.innerHTML += `<div class="message bot">COOPBOT: ${aiResponse}</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
             // Add bot response to chat history
@@ -444,16 +442,17 @@
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendButton.click();
     });
-
-    // Close modal implementation
+    
     window.addEventListener('message', (event) => {
-        if (event.data === 'closeModal') {
-            const modal = document.querySelector('.elementor-modal'); // Adjust this selector to match your modal element
-            if (modal) {
-                modal.style.display = 'none'; // Close the modal
-            }
+    if (event.data === 'closeModal') {
+        // Assuming you're using Elementor's modal system
+        const modal = document.querySelector('.elementor-modal'); // Adjust this selector to match your modal element
+        if (modal) {
+            modal.style.display = 'none'; // Close the modal
         }
-    });
+    }
+});
+
 </script>
 
 </body>
