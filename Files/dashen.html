@@ -260,7 +260,7 @@
 <body>
     <div id="sidebar">
         <img src="https://gasheai.nehabi.com/extensions/uploads/sites/561/2024/11/retina-logopng-1.png" alt="Placeholder Photo">
-        <h2>Welcome to GasheAI</h2> <br> <h2>I am SafariBot, vertual assistance of  Ethio Safaricom</h2>
+        <h2>Welcome to GasheAI</h2> <br> <h2>I am DashenBot, vertual assistance of  Ethio Daashen Bank</h2>
         <p>Choose your language and enjoy chatting with Safaricom.</p>
     </div>
 
@@ -402,7 +402,7 @@
             let aiResponse = data.choices[0].message.content;
 
             // Format response in Markdown
-            aiResponse = `**SafariBot:**\n\n${aiResponse.replace(/\n/g, '\n\n')}`;
+            aiResponse = `**DashenBot:**\n\n${aiResponse.replace(/\n/g, '\n\n')}`;
 
             // Translate AI response to current language
             aiResponse = await translateText(aiResponse, currentLanguage);
