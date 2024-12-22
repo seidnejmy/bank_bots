@@ -3,60 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enhanced Text Translator</title>
+  <title>GASHE TRANSLATOR</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
+      background-color: #fce4ec; /* Light Pink Background */
+      color: #4a2c54; /* Dark Purple */
       margin: 0;
-      background-color: #f9f9f9;
+      padding: 20px;
     }
-    input, textarea, button, select {
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      background-color: #9b59b6; /* Purple Header */
       padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-      width: 100%;
-      max-width: 400px;
-      box-sizing: border-box;
+      border-radius: 10px;
+      color: white;
     }
-    button {
-      cursor: pointer;
-      background-color: #007BFF;
+
+    h1 {
+      margin: 0; /* Remove default margins */
+    }
+
+    .back-button {
+      background-color: #e91e63; /* Pink */
       color: white;
       border: none;
+      padding: 10px 15px;
+      margin-bottom: 20px;
+      cursor: pointer;
       border-radius: 5px;
-      transition: background-color 0.3s ease;
+      font-size: 1rem;
     }
-    button:hover {
-      background-color: #0056b3;
+    
+    .back-button:hover {
+      background-color: #d81b60; /* Darker Pink */
     }
-    .output {
-      margin-top: 20px;
-      font-size: 18px;
+
+    form {
+      background-color: #ffffff; /* White Background for form */
+      border: 1px solid #dcdcdc;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+    }
+
+    label {
       font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+      color: #4a2c54; /* Dark Purple for labels */
     }
-    .error {
-      color: red;
-      font-size: 14px;
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #dcdcdc;
+      margin-bottom: 15px;
+      resize: none;
     }
+
+    textarea:focus {
+      outline: none;
+      border-color: #9b59b6; /* Purple Focused Border */
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #dcdcdc;
+      margin-bottom: 15px;
+      background-color: #f9f9f9;
+    }
+
+    button[type="submit"] {
+      background-color: #9b59b6; /* Purple */
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #8e44ad; /* Darker Purple */
+    }
+
     .spinner {
+      margin-left: 10px;
       display: inline-block;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #9b59b6; /* Purple Spinner */
+      border-radius: 50%;
       width: 20px;
       height: 20px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #007BFF;
-      border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin-left: 10px;
     }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    .output, .error {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      color: #d50000; /* Red text for error */
+    }
+
+    .output {
+      background-color: #e8f5e9; /* Light Green for successful output */
+      border: 1px solid #388e3c; /* Green Border */
+      color: #388e3c; /* Green text */
+    }
+
+    .error {
+      background-color: #fcdada; /* Light Red for error output */
+      border: 1px solid #d50000; /* Red Border */
+    }
   </style>
 </head>
 <body>
-  <h1>Text Translator</h1>
+  <div class="header">
+    <button class="back-button" onclick="window.history.back();">Back</button>
+    <h1>GASHE TRANSLATOR</h1>
+  </div>
+  
   <form id="translate-form" aria-label="Text Translator Form">
     <label for="input-text">Enter text to translate:</label><br>
     <textarea id="input-text" placeholder="Type or paste text here" required aria-label="Text to translate" rows="6"></textarea><br>
@@ -66,8 +145,7 @@
       <option value="so">Somali</option>
       <option value="om">Oromo</option>
       <option value="ti">Tigrinya</option>
-	  <option value="af">Afar</option>
-
+      <option value="aa">Afar</option>
     </select><br>
     <button type="submit" id="translate-button" aria-label="Translate Button">Translate</button>
     <span id="loading-spinner" class="spinner" style="display: none;" aria-hidden="true"></span>
@@ -77,7 +155,6 @@
   <div id="error-message" class="error" aria-live="polite"></div>
 
   <script>
-    // Function to split large text into smaller chunks
     const splitTextIntoChunks = (text, maxChunkSize = 500) => {
       const chunks = [];
       let start = 0;
@@ -88,7 +165,6 @@
       return chunks;
     };
 
-    // Function to fetch translation from Google Translate API
     const translateWithGoogleWeb = async (text, sourceLang, targetLang) => {
       const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
       
@@ -98,10 +174,7 @@
           throw new Error(`HTTP Error: ${response.status}`);
         }
         const result = await response.json();
-
-        // Parse the translation result
         if (result && result[0]) {
-          // Combine all translated parts (handles multiple sentences)
           return result[0].map(part => part[0]).join('');
         } else {
           throw new Error('Invalid translation response.');
@@ -112,7 +185,6 @@
       }
     };
 
-    // Function to handle large text translation
     const translateLargeText = async (text, sourceLang, targetLang) => {
       const chunks = splitTextIntoChunks(text);
       const translatedChunks = [];
@@ -125,7 +197,6 @@
       return translatedChunks.join(' ');
     };
 
-    // DOM elements
     const form = document.getElementById('translate-form');
     const inputField = document.getElementById('input-text');
     const languageSelect = document.getElementById('language-select');
@@ -134,10 +205,8 @@
     const errorDiv = document.getElementById('error-message');
     const loadingSpinner = document.getElementById('loading-spinner');
 
-    // Form submission handler
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-
       const text = inputField.value.trim();
       const targetLang = languageSelect.value;
 
@@ -146,7 +215,6 @@
         return;
       }
 
-      // Clear previous output and show loading spinner
       outputDiv.innerText = '';
       errorDiv.innerText = '';
       translateButton.disabled = true;
@@ -155,7 +223,7 @@
       try {
         const translatedText = await translateLargeText(text, 'auto', targetLang);
         outputDiv.innerText = `Translated Text: ${translatedText}`;
-        inputField.value = ''; // Clear input field after translation
+        inputField.value = '';
       } catch (error) {
         errorDiv.innerText = error.message;
       } finally {
