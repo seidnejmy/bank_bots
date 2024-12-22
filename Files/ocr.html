@@ -43,16 +43,15 @@
       font-weight: bold;
     }
 
-    /* Label for the file input */
+    /* Label for the file input (smaller file upload button) */
     .file-label {
       background-color: #D500F9; /* Pink color */
       color: #fff;
-      padding: 12px 25px;
+      padding: 8px 15px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 16px;
       transition: background-color 0.3s;
-      margin-top: 15px;
     }
 
     .file-label:hover {
@@ -125,6 +124,7 @@
   <div class="container">
     <h2>GasheAI Free OCR Service</h2>
     
+    <!-- Smaller File Upload Input -->
     <label for="file-input" class="file-label">Choose an image or PDF</label>
     <input type="file" id="file-input" style="display:none;" accept="image/*" />
 
@@ -133,6 +133,7 @@
     <h3>Extracted Text:</h3>
     <pre id="result-text">Select an image or PDF to begin OCR...</pre>
 
+    <!-- Download buttons -->
     <div class="download-btns">
       <button id="download-txt" disabled>Download as Text</button>
       <button id="download-pdf" disabled>Download as PDF</button>
@@ -145,14 +146,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.19.1/docxtemplater.js"></script>
 
   <script>
+    // Handle file selection and enable Extract Text button
     document.getElementById('file-input').addEventListener('change', () => {
       const fileInput = document.getElementById('file-input');
       const extractBtn = document.getElementById('extract-btn');
-
+      
       if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        console.log('File selected:', file.name, file.type, file.size);
-        
         extractBtn.style.opacity = '1';
         extractBtn.style.pointerEvents = 'auto';
         extractBtn.disabled = false;
@@ -162,7 +161,7 @@
     document.getElementById('extract-btn').addEventListener('click', async () => {
       const fileInput = document.getElementById('file-input');
       const file = fileInput.files[0];
-
+      
       if (!file) {
         alert("Please select an image or PDF file first.");
         return;
@@ -172,46 +171,52 @@
       const extractBtn = document.getElementById('extract-btn');
       resultTextElement.textContent = "Processing...";
 
+      // Disable Extract Text button during processing
       extractBtn.style.opacity = '0.5';
       extractBtn.style.pointerEvents = 'none';
       extractBtn.disabled = true;
 
       try {
+        // Perform OCR using Tesseract.js on image files
         const result = await Tesseract.recognize(
           file,
-          'eng',
-          { logger: m => console.log(m) }
+          'eng', // Language code (you can add more languages here)
+          {
+            logger: (m) => console.log(m) // Optional logger for progress
+          }
         );
 
+        // Display the extracted text
         const extractedText = result.data.text || 'No text detected';
         resultTextElement.textContent = extractedText;
 
+        // Enable download buttons after OCR
         enableDownloadButtons(extractedText);
+
       } catch (error) {
         console.error('Error during OCR extraction:', error);
         resultTextElement.textContent = 'Error occurred during OCR processing.';
       } finally {
+        // Re-enable Extract Text button after OCR completion
         extractBtn.style.opacity = '1';
         extractBtn.style.pointerEvents = 'auto';
         extractBtn.disabled = false;
       }
     });
 
+    // Function to enable download buttons after OCR extraction
     function enableDownloadButtons(extractedText) {
-      const downloadTxt = document.getElementById('download-txt');
-      const downloadPdf = document.getElementById('download-pdf');
-      const downloadDocx = document.getElementById('download-docx');
-
-      downloadTxt.style.opacity = '1';
-      downloadTxt.style.pointerEvents = 'auto';
+      document.getElementById('download-txt').style.opacity = '1';
+      document.getElementById('download-txt').style.pointerEvents = 'auto';
       
-      downloadPdf.style.opacity = '1';
-      downloadPdf.style.pointerEvents = 'auto';
+      document.getElementById('download-pdf').style.opacity = '1';
+      document.getElementById('download-pdf').style.pointerEvents = 'auto';
       
-      downloadDocx.style.opacity = '1';
-      downloadDocx.style.pointerEvents = 'auto';
+      document.getElementById('download-docx').style.opacity = '1';
+      document.getElementById('download-docx').style.pointerEvents = 'auto';
 
-      downloadTxt.addEventListener('click', () => {
+      // Enable download actions
+      document.getElementById('download-txt').addEventListener('click', () => {
         const blob = new Blob([extractedText], { type: 'text/plain' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -219,14 +224,16 @@
         link.click();
       });
 
-      downloadPdf.addEventListener('click', () => {
+      // Download PDF
+      document.getElementById('download-pdf').addEventListener('click', () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.text(extractedText, 10, 10);
         doc.save('extracted_text.pdf');
       });
 
-      downloadDocx.addEventListener('click', () => {
+      // Download Word Document
+      document.getElementById('download-docx').addEventListener('click', () => {
         const zip = new PizZip();
         const doc = new docxtemplater(zip);
         doc.setData({ text: extractedText });
