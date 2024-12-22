@@ -8,11 +8,36 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: linear-gradient(to bottom, #8e44ad, #f39c12); /* Purple to Gold gradient */
+            background: linear-gradient(to bottom, #8e44ad, #f39c12);
+            height: 100vh;
+        }
+        .header {
+            width: 100%;
+            background-color: #6A0DAD; /* Purple color */
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+        .back-button {
+            position: absolute;
+            left: 20px;
+            top: 15px;
+            background-color: #FFD700; /* Gold color */
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #FFB300; /* Darker gold */
         }
         .container {
             text-align: center;
@@ -22,6 +47,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 85%;
             max-width: 900px;
+            margin-top: 60px; /* Space for header */
         }
         h1 {
             font-size: 40px;
@@ -29,9 +55,9 @@
             margin-bottom: 30px;
         }
         button {
-            padding: 12px 30px;
-            font-size: 18px;
-            margin: 10px;
+            padding: 8px 20px; /* Smaller padding */
+            font-size: 16px; /* Smaller font size */
+            margin: 10px 5px; /* Margin adjustment */
             cursor: pointer;
             border: none;
             border-radius: 8px;
@@ -82,24 +108,29 @@
 </head>
 <body>
 
+    <div class="header">
+        <button class="back-button" onclick="window.history.back();">Back</button>
+        GasheAI Tools
+    </div>
+
     <div class="container">
         <h1>GasheAI Free QR Code Creator</h1>
 
         <!-- Buttons to select QR Code types -->
-        <button onclick="setQRType('url')">Generate URL QR Code</button>
-        <button onclick="setQRType('vcard')">Generate vCard QR Code</button>
-        <button onclick="setQRType('text')">Generate Text QR Code</button>
-        <button onclick="setQRType('email')">Generate Email QR Code</button>
-        <button onclick="setQRType('sms')">Generate SMS QR Code</button>
-        <button onclick="setQRType('wifi')">Generate Wi-Fi QR Code</button>
-        <button onclick="setQRType('bitcoin')">Generate Bitcoin QR Code</button>
-        <button onclick="setQRType('twitter')">Generate Twitter QR Code</button>
-        <button onclick="setQRType('facebook')">Generate Facebook QR Code</button>
-        <button onclick="setQRType('pdf')">Generate PDF QR Code</button>
-        <button onclick="setQRType('mp3')">Generate MP3 QR Code</button>
-        <button onclick="setQRType('appstores')">Generate App Store QR Code</button>
-        <button onclick="setQRType('image')">Generate Image QR Code</button>
-        <button onclick="setQRType('barcode')">Generate Barcode</button>
+        <button onclick="setQRType('url')">URL</button>
+        <button onclick="setQRType('vcard')">vCard</button>
+        <button onclick="setQRType('text')">Text</button>
+        <button onclick="setQRType('email')">Email</button>
+        <button onclick="setQRType('sms')">SMS</button>
+        <button onclick="setQRType('wifi')">Wi-Fi</button>
+        <button onclick="setQRType('bitcoin')">Bitcoin</button>
+        <button onclick="setQRType('twitter')">Twitter</button>
+        <button onclick="setQRType('facebook')">Facebook</button>
+        <button onclick="setQRType('pdf')">PDF</button>
+        <button onclick="setQRType('mp3')">MP3</button>
+        <button onclick="setQRType('appstores')">App Store</button>
+        <button onclick="setQRType('image')">Image</button>
+        <button onclick="setQRType('barcode')">Barcode</button>
 
         <div id="inputFields">
             <input type="text" id="inputText" placeholder="Enter text for QR/Barcode">
