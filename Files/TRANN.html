@@ -80,7 +80,7 @@
       background-color: #f9f9f9;
     }
 
-    button[type="submit"] {
+    button[type="submit"], .download-button {
       background-color: #9b59b6; /* Purple */
       color: white;
       border: none;
@@ -89,9 +89,10 @@
       cursor: pointer;
       font-size: 1rem;
       transition: background-color 0.3s;
+      margin-right: 10px;
     }
 
-    button[type="submit"]:hover {
+    button[type="submit"]:hover, .download-button:hover {
       background-color: #8e44ad; /* Darker Purple */
     }
 
@@ -145,7 +146,7 @@
       <option value="so">Somali</option>
       <option value="om">Oromo</option>
       <option value="ti">Tigrinya</option>
-      <option value="aa">Afar</option>
+      <option value="af">Afar</option>
     </select><br>
     <button type="submit" id="translate-button" aria-label="Translate Button">Translate</button>
     <span id="loading-spinner" class="spinner" style="display: none;" aria-hidden="true"></span>
@@ -153,6 +154,12 @@
 
   <div id="translated-text" class="output" aria-live="polite"></div>
   <div id="error-message" class="error" aria-live="polite"></div>
+  
+  <div>
+    <button class="download-button" id="download-docx">Download as DOCX</button>
+    <button class="download-button" id="download-pdf">Download as PDF</button>
+    <button class="download-button" id="download-txt">Download as TXT</button>
+  </div>
 
   <script>
     const splitTextIntoChunks = (text, maxChunkSize = 500) => {
@@ -224,6 +231,8 @@
         const translatedText = await translateLargeText(text, 'auto', targetLang);
         outputDiv.innerText = `Translated Text: ${translatedText}`;
         inputField.value = '';
+        // Store translated text in a variable for later use
+        window.translatedText = translatedText; 
       } catch (error) {
         errorDiv.innerText = error.message;
       } finally {
@@ -231,6 +240,50 @@
         loadingSpinner.style.display = 'none';
       }
     });
+
+    // Function to download translated text as TXT
+    document.getElementById('download-txt').addEventListener('click', function () {
+      const blob = new Blob([window.translatedText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'translated_text.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Function to download translated text as PDF
+    document.getElementById('download-pdf').addEventListener('click', function () {
+      const doc = new jsPDF();
+      doc.text(window.translatedText, 10, 10);
+      doc.save('translated_text.pdf');
+    });
+
+    // Function to download translated text as DOCX
+    document.getElementById('download-docx').addEventListener('click', function () {
+      const blob = new Blob([`
+      <html xmlns:w="urn:schemas-microsoft-com:office:word">
+      <head>
+        <meta charset="utf-8" />
+        <style>
+          body { font-family: Arial; }
+        </style>
+      </head>
+      <body>
+        <p>${window.translatedText}</p>
+      </body>
+      </html>`], {
+        type: 'application/msword'
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'translated_text.doc';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 </html>
