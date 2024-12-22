@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GasheAI Free QR Code Creator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(to bottom, #8e44ad, #f39c12); /* Purple to Gold gradient */
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 85%;
+            max-width: 900px;
+        }
+        h1 {
+            font-size: 40px;
+            color: #9b59b6;  /* Purple */
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 12px 30px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #e74c3c, #f39c12); /* Pink to Gold */
+            color: white;
+            transition: background 0.3s, transform 0.2s ease-in-out;
+        }
+        button:hover {
+            background: linear-gradient(45deg, #f39c12, #e74c3c);
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        #inputFields input[type="text"], #inputFields input[type="tel"], #inputFields input[type="email"], #inputFields select {
+            padding: 12px;
+            margin: 12px;
+            width: 280px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #9b59b6;  /* Purple border */
+        }
+        #inputFields select {
+            background-color: #f0f0f0;
+        }
+        #barcode, #qrcode {
+            margin-top: 30px;
+        }
+        .download-btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: #2ecc71;
+            color: white;
+            display: none;  /* Initially hidden */
+            transition: background 0.3s;
+        }
+        .download-btn:hover {
+            background: #27ae60;
+        }
+        .color-picker {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>GasheAI Free QR Code Creator</h1>
+
+        <!-- Buttons to select QR Code types -->
+        <button onclick="setQRType('url')">Generate URL QR Code</button>
+        <button onclick="setQRType('vcard')">Generate vCard QR Code</button>
+        <button onclick="setQRType('text')">Generate Text QR Code</button>
+        <button onclick="setQRType('email')">Generate Email QR Code</button>
+        <button onclick="setQRType('sms')">Generate SMS QR Code</button>
+        <button onclick="setQRType('wifi')">Generate Wi-Fi QR Code</button>
+        <button onclick="setQRType('bitcoin')">Generate Bitcoin QR Code</button>
+        <button onclick="setQRType('twitter')">Generate Twitter QR Code</button>
+        <button onclick="setQRType('facebook')">Generate Facebook QR Code</button>
+        <button onclick="setQRType('pdf')">Generate PDF QR Code</button>
+        <button onclick="setQRType('mp3')">Generate MP3 QR Code</button>
+        <button onclick="setQRType('appstores')">Generate App Store QR Code</button>
+        <button onclick="setQRType('image')">Generate Image QR Code</button>
+        <button onclick="setQRType('barcode')">Generate Barcode</button>
+
+        <div id="inputFields">
+            <input type="text" id="inputText" placeholder="Enter text for QR/Barcode">
+        </div>
+
+        <br>
+        <button onclick="generateQRCode()">Generate QR Code</button>
+        <button onclick="generateBarcode()">Generate Barcode</button>
+
+        <div class="color-picker">
+            <label for="qrColor">Choose QR Code Color:</label>
+            <input type="color" id="qrColor" value="#9b59b6" onchange="changeQRCodeColor()">
+        </div>
+
+        <div id="qrcode"></div>
+        <svg id="barcode"></svg>
+
+        <button class="download-btn" id="downloadBtn" onclick="downloadImage()">Download Image</button>
+    </div>
+
+    <!-- Include the QR Code and JsBarcode Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+
+    <script>
+        // Variable to hold current QR type
+        let currentQRType = 'text';  // Default is Text QR Code
+        let generatedImageUrl = '';  // Store the generated image URL
+        let qrColor = '#9b59b6'; // Default color for QR code
+
+        // Set the QR type and update input fields
+        function setQRType(type) {
+            currentQRType = type;
+            updateInputFields();
+        }
+
+        // Function to update input fields based on QR type
+        function updateInputFields() {
+            const inputFields = document.getElementById('inputFields');
+            inputFields.innerHTML = ''; // Clear previous inputs
+
+            // Show relevant fields based on QR type
+            if (currentQRType === 'url') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter URL">';
+            } else if (currentQRType === 'vcard') {
+                inputFields.innerHTML = `\
+                    <input type="text" id="vCardName" placeholder="Full Name">\
+                    <input type="tel" id="vCardPhone" placeholder="Phone Number">\
+                    <input type="email" id="vCardEmail" placeholder="Email">\
+                    <input type="text" id="vCardAddress" placeholder="Address">\
+                `;
+            } else if (currentQRType === 'email') {
+                inputFields.innerHTML = '<input type="email" id="inputText" placeholder="Enter Email Address">';
+            } else if (currentQRType === 'sms') {
+                inputFields.innerHTML = '<input type="tel" id="inputText" placeholder="Enter Phone Number for SMS">';
+            } else if (currentQRType === 'wifi') {
+                inputFields.innerHTML = `\
+                    <input type="text" id="wifiSSID" placeholder="Wi-Fi SSID">\
+                    <input type="text" id="wifiPassword" placeholder="Wi-Fi Password">\
+                    <select id="wifiEncryption">\
+                        <option value="WPA">WPA</option>\
+                        <option value="WEP">WEP</option>\
+                        <option value="nopassword">No Password</option>\
+                    </select>\
+                `;
+            } else if (currentQRType === 'bitcoin') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter Bitcoin Address">';
+            } else if (currentQRType === 'text') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter Text">';
+            } else if (currentQRType === 'twitter') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter Twitter Handle">';
+            } else if (currentQRType === 'facebook') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter Facebook URL">';
+            } else if (currentQRType === 'pdf') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter PDF URL">';
+            } else if (currentQRType === 'mp3') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter MP3 URL">';
+            } else if (currentQRType === 'appstores') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter App Store URL">';
+            } else if (currentQRType === 'image') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter Image URL">';
+            } else if (currentQRType === 'barcode') {
+                inputFields.innerHTML = '<input type="text" id="inputText" placeholder="Enter text for Barcode">';
+            }
+        }
+
+        // Function to generate QR Code
+        function generateQRCode() {
+            let inputText = document.getElementById('inputText').value;
+
+            // Handle specific QR types
+            if (currentQRType === 'vcard') {
+                const name = document.getElementById('vCardName').value;
+                const phone = document.getElementById('vCardPhone').value;
+                const email = document.getElementById('vCardEmail').value;
+                const address = document.getElementById('vCardAddress').value;
+                inputText = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nADR:${address}\nEND:VCARD`;
+            } else if (currentQRType === 'wifi') {
+                const ssid = document.getElementById('wifiSSID').value;
+                const password = document.getElementById('wifiPassword').value;
+                const encryption = document.getElementById('wifiEncryption').value;
+                inputText = `WIFI:T:${encryption};S:${ssid};P:${password};;`;
+            }
+
+            // Generate QR Code
+            if (inputText) {
+                document.getElementById('qrcode').innerHTML = '';  // Clear previous QR code
+                QRCode.toDataURL(inputText, {
+                    width: 256,
+                    margin: 2,
+                    color: {
+                        dark: qrColor,  // Dynamic color for QR code
+                        light: "#ffffff"  // Light background color
+                    }
+                }, function (error, url) {
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        // Store the generated QR code image URL
+                        generatedImageUrl = url;
+
+                        // Display the generated QR code as an image
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.alt = "QR Code";
+                        document.getElementById('qrcode').appendChild(img);
+
+                        // Show the download button
+                        document.getElementById('downloadBtn').style.display = 'inline-block';
+                    }
+                });
+            } else {
+                alert('Please enter the necessary information to generate QR Code');
+            }
+        }
+
+        // Function to generate Barcode
+        function generateBarcode() {
+            const inputText = document.getElementById('inputText').value;
+            if (inputText) {
+                JsBarcode("#barcode", inputText, {
+                    format: "CODE128",  // Barcode type
+                    lineColor: qrColor,  // Dynamic color for Barcode
+                    width: 2,
+                    height: 100,
+                    displayValue: true
+                });
+
+                // Set up the download button
+                document.getElementById('downloadBtn').style.display = 'inline-block';
+            } else {
+                alert('Please enter text to generate Barcode');
+            }
+        }
+
+        // Function to download the image
+        function downloadImage() {
+            if (generatedImageUrl) {
+                const link = document.createElement('a');
+                link.href = generatedImageUrl;
+                link.download = 'generated-qr-code.png';
+                link.click();
+            } else {
+                alert('No image to download');
+            }
+        }
+
+        // Function to change QR code color
+        function changeQRCodeColor() {
+            qrColor = document.getElementById('qrColor').value;
+            if (generatedImageUrl) {
+                generateQRCode();  // Re-generate the QR code with the new color
+            }
+        }
+
+        // Initialize the form with default input fields
+        updateInputFields();  // Show default input fields when page loads
+    </script>
+
+</body>
+</html>

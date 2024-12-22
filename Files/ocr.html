@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GasheAI Free OCR Service</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.3/dist/tesseract.min.js"></script>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body styling */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f7fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+
+    /* Container for form and results */
+    .container {
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 400px;
+      text-align: center;
+    }
+
+    /* Heading */
+    h2 {
+      color: #6A0DAD; /* Purple color */
+      font-size: 26px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    /* Label for the file input */
+    .file-label {
+      background-color: #D500F9; /* Pink color */
+      color: #fff;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color 0.3s;
+      margin-top: 15px;
+    }
+
+    .file-label:hover {
+      background-color: #C2185B; /* Darker pink */
+    }
+
+    /* Button styling */
+    button {
+      background-color: #FFD700; /* Gold color */
+      color: #fff;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+      opacity: 0.5; /* Initially greyed out */
+      pointer-events: none; /* Disabled initially */
+    }
+
+    button:hover {
+      background-color: #FFB300; /* Darker gold */
+    }
+
+    /* Result display */
+    pre {
+      background-color: #f1f1f1;
+      padding: 15px;
+      border-radius: 8px;
+      color: #333;
+      font-size: 16px;
+      word-wrap: break-word;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+
+    /* Download buttons container */
+    .download-btns {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .download-btns button {
+      background-color: #4CAF50; /* Green */
+      font-size: 16px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      opacity: 0.5; /* Initially greyed out */
+      pointer-events: none; /* Disabled initially */
+    }
+
+    .download-btns button:hover {
+      background-color: #45a049; /* Darker green */
+    }
+
+    /* Alert message for processing */
+    .processing-message {
+      font-style: italic;
+      color: #888;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>GasheAI Free OCR Service</h2>
+    
+    <!-- File upload input with styled label -->
+    <label for="file-input" class="file-label">Choose an image or PDF</label>
+    <input type="file" id="file-input" />
+    <button id="extract-btn" disabled>Extract Text</button>
+
+    <h3>Extracted Text:</h3>
+    <pre id="result-text">Select an image or PDF to begin OCR...</pre>
+
+    <!-- Download buttons -->
+    <div class="download-btns">
+      <button id="download-txt" disabled>Download as Text</button>
+      <button id="download-pdf" disabled>Download as PDF</button>
+      <button id="download-docx" disabled>Download as Word</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPDF/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.0.6/pizzip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.19.1/docxtemplater.js"></script>
+
+  <script>
+    // Handle file selection and enable Extract Text button
+    document.getElementById('file-input').addEventListener('change', () => {
+      const fileInput = document.getElementById('file-input');
+      const extractBtn = document.getElementById('extract-btn');
+      
+      if (fileInput.files.length > 0) {
+        extractBtn.style.opacity = '1';
+        extractBtn.style.pointerEvents = 'auto';
+        extractBtn.disabled = false;
+      }
+    });
+
+    document.getElementById('extract-btn').addEventListener('click', async () => {
+      const fileInput = document.getElementById('file-input');
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        alert("Please select an image or PDF file first.");
+        return;
+      }
+
+      const resultTextElement = document.getElementById('result-text');
+      const extractBtn = document.getElementById('extract-btn');
+      resultTextElement.textContent = "Processing...";
+
+      // Disable Extract Text button during processing
+      extractBtn.style.opacity = '0.5';
+      extractBtn.style.pointerEvents = 'none';
+      extractBtn.disabled = true;
+
+      try {
+        // Perform OCR using Tesseract.js on image and PDF files
+        const result = await Tesseract.recognize(
+          file,
+          'eng', // Language code (you can add more languages here)
+          {
+            logger: (m) => console.log(m) // Optional logger for progress
+          }
+        );
+
+        // Display the extracted text
+        const extractedText = result.data.text || 'No text detected';
+        resultTextElement.textContent = extractedText;
+
+        // Enable download buttons after OCR
+        enableDownloadButtons(extractedText);
+
+      } catch (error) {
+        console.error('Error during OCR extraction:', error);
+        resultTextElement.textContent = 'Error occurred during OCR processing.';
+      } finally {
+        // Re-enable Extract Text button after OCR completion
+        extractBtn.style.opacity = '1';
+        extractBtn.style.pointerEvents = 'auto';
+        extractBtn.disabled = false;
+      }
+    });
+
+    // Function to enable download buttons after OCR extraction
+    function enableDownloadButtons(extractedText) {
+      document.getElementById('download-txt').style.opacity = '1';
+      document.getElementById('download-txt').style.pointerEvents = 'auto';
+      
+      document.getElementById('download-pdf').style.opacity = '1';
+      document.getElementById('download-pdf').style.pointerEvents = 'auto';
+      
+      document.getElementById('download-docx').style.opacity = '1';
+      document.getElementById('download-docx').style.pointerEvents = 'auto';
+
+      // Enable download actions
+      document.getElementById('download-txt').addEventListener('click', () => {
+        const blob = new Blob([extractedText], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'extracted_text.txt';
+        link.click();
+      });
+
+      // Download PDF
+      document.getElementById('download-pdf').addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text(extractedText, 10, 10);
+        doc.save('extracted_text.pdf');
+      });
+
+      // Download Word Document
+      document.getElementById('download-docx').addEventListener('click', () => {
+        const zip = new PizZip();
+        const doc = new docxtemplater(zip);
+        doc.setData({ text: extractedText });
+        doc.render();
+        const buf = doc.getZip().generate({ type: 'nodebuffer' });
+        const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'extracted_text.docx';
+        link.click();
+      });
+    }
+  </script>
+
+</body>
+</html>
