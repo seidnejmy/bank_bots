@@ -260,8 +260,8 @@
 <body>
     <div id="sidebar">
         <img src="https://gasheai.nehabi.com/extensions/uploads/sites/561/2024/11/retina-logopng-1.png" alt="Placeholder Photo">
-        <h2>Welcome to GasheAI</h2> <br> <h2>I am SafariBot, vertual assistance of  Ethio Safaricom</h2>
-        <p>Choose your language and enjoy chatting with Safaricom.</p>
+        <h2>Welcome to GasheAI</h2> <br> <h2>I am Awash bank's virtual assistance </h2>
+        <p>Choose your language and enjoy chatting with Awash Assistant</p>
     </div>
 
     <div id="main-content">
@@ -386,28 +386,13 @@
 					{ 
 					  "role": "system", 
 					  "content": `
-						You are the official virtual assistant of Safaricom. Your role is to assist users in enhancing their connectivity and services through innovative telecommunications solutions (APPOLOGIZE FORE OUT OF THE BOX UERY).
+						You are the official virtual assistant of Awash Bank. Your role is to assist users in their Questions. apologize for out-of box questions.
 
-						**Crucial Information:**
-						- **Company Overview**: Safaricom is a leading telecommunications company in Ethiopia that provides comprehensive communication services, including mobile, internet, and digital solutions.
-						- **Key Services**: Tele voice packages, data packages, SMS packages, 4G Wi-Fi packages, and M-PESA services.
-						- **Support Resources**: Comprehensive tutorials, documentation, and dedicated customer support.
-						- **Contact**: +251-9-11-11-1222 or info@safaricom.et.
-
-						**Packages Overview:**
-						1. **Tele Voice Packages**: Various plans offering voice call minutes and SMS options across daily, weekly, and monthly plans.
-						2. **Data Packages**: Different data bundles available for daily, weekly, and monthly needs.
-						3. **SMS Packages**: Categorized into daily, weekly, and monthly plans.
-						4. **4G Wi-Fi Packages**: Designed for personal and business use with various data allowances.
-						5. **Trending Packages**: Highlighted popular choices for voice, data, and SMS.
-						6. **Purchase Options**: Customers can purchase packages via dialing *777# or using the M-PESA Safaricom app.
-
-						Please assist users with inquiries regarding features, services, support, and telecommunications solutions offered by Safaricom.
+						Please assist users with inquiries regarding features, services, offered by Awash Bank.
 					  `
 					},
 					...chatHistory // Include full chat history
 				  ]
-
 				
                 })
             });
@@ -418,7 +403,7 @@
             let aiResponse = data.choices[0].message.content;
 
             // Format response in Markdown
-            aiResponse = `**SafariBot:**\n\n${aiResponse.replace(/\n/g, '\n\n')}`;
+            aiResponse = `**AwashBot:**\n\n${aiResponse.replace(/\n/g, '\n\n')}`;
 
             // Translate AI response to current language
             aiResponse = await translateText(aiResponse, currentLanguage);
@@ -442,15 +427,6 @@
         if (e.key === 'Enter') sendButton.click();
     });
 
-    // Close modal implementation
-    window.addEventListener('message', (event) => {
-        if (event.data === 'closeModal') {
-            const modal = document.querySelector('.elementor-modal'); // Adjust this selector to match your modal element
-            if (modal) {
-                modal.style.display = 'none'; // Close the modal
-            }
-        }
-    });
 </script>
 
 </body>
