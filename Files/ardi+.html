@@ -386,7 +386,7 @@
 					{ 
 					  "role": "system", 
 					  "content": `
-						You are the official virtual assistant of Ethio Telecom. Your role is to assist users in enhancing their connectivity and services through innovative telecommunications solutions.
+						You are the official virtual assistant of Ethio Telecom. Your role is to assist users just answering their uestions, no more.
 
 						**Crucial Information:**
 						- **Company Overview**: Ethio Telecom is a leading telecommunications company in Ethiopia that provides comprehensive communication services, including mobile, internet, and digital solutions.
@@ -433,15 +433,6 @@
         if (e.key === 'Enter') sendButton.click();
     });
 
-    // Close modal implementation
-    window.addEventListener('message', (event) => {
-        if (event.data === 'closeModal') {
-            const modal = document.querySelector('.elementor-modal'); // Adjust this selector to match your modal element
-            if (modal) {
-                modal.style.display = 'none'; // Close the modal
-            }
-        }
-    });
 </script>
 
 </body>
