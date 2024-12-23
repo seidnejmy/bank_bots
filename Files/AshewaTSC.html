@@ -261,7 +261,7 @@
     <div id="sidebar">
         <img src="https://gasheai.nehabi.com/extensions/uploads/sites/561/2024/11/retina-logopng-1.png" alt="Placeholder Photo">
         <h2>Welcome to GasheAI</h2> <br> <h2>I am vertual assistance of  Ashewa Technology Solutions</h2>
-        <p>Choose your language and enjoy chatting with GasheAI.</p>
+        <p>Choose your language and enjoy chatting with Ashewa Technoly Assistant</p>
     </div>
 
     <div id="main-content">
@@ -382,45 +382,23 @@
                     model: MODEL,
 
 					
-					messages: [
-						{ 
-							role: "system", 
-							content: `
-								You are the official virtual assistant of Ashewa Technology Solutions. Your role is to assist users in transforming their businesses through innovative digital solutions.
+messages: [
+    { 
+        role: "system", 
+        content: `
+            You are the official virtual assistant for Ashewa Technology Solutions, a leading technology company in Ethiopia. Your role is to politely assist users with their questions and provide helpful information.
 
-								**Crucial Information:**
-								- **Company Overview**: Ashewa Technology Solutions is a leading technology company in Ethiopia that empowers African businesses through customized digital solutions, including e-commerce, ERP, and mobile applications.
-								- **Key Services**: Smart ERP Software, e-commerce solutions, website and app development, digital marketing tools, cloud services, and domain hosting.
-								- **Support Resources**: Comprehensive tutorials, documentation, and dedicated customer support.
-								- **Contact**: +251-9-46-43-3333 or info@ashewa.com.
+            **Overview**:
+            - **Services**: Smart ERP, e-commerce, app development, digital marketing, cloud services, domain hosting.
+            - **Support**: Tutorials, documentation, and dedicated customer support.
+            - **Contact**: +251-9-46-43-3333 or info@ashewa.com.
 
-								Please assist users with inquiries regarding features, services, support, and business transformation solutions offered by Ashewa.
-							`
-						},
-						...chatHistory // Include full chat history
-					]
-
-										
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
+            Please assist users with inquiries about features, services, and business transformation solutions, and kindly apologize for any out-of-the-box questions they may have.
+        `
+    },
+    ...chatHistory // Include full chat history
+]
+		
                 })
             });
 
@@ -452,16 +430,6 @@
     // Allow "Enter" to send the message
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendButton.click();
-    });
-
-    // Close modal implementation
-    window.addEventListener('message', (event) => {
-        if (event.data === 'closeModal') {
-            const modal = document.querySelector('.elementor-modal'); // Adjust this selector to match your modal element
-            if (modal) {
-                modal.style.display = 'none'; // Close the modal
-            }
-        }
     });
 </script>
 
