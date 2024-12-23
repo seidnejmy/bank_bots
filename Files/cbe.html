@@ -427,16 +427,6 @@
         if (e.key === 'Enter') sendButton.click();
     });
 
-    // Close modal implementation
-    window.addEventListener('message', (event) => {
-        if (event.data === 'closeModal') {
-            const modal = document.querySelector('.elementor-modal'); // Adjust this selector to match your modal element
-            if (modal) {
-                modal.style.display = 'none'; // Close the modal
-            }
-        }
-    });
 </script>
-
 </body>
 </html>
