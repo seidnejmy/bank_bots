@@ -381,33 +381,19 @@
                 body: JSON.stringify({
                     model: MODEL,
 
+"messages": [
+    { 
+        "role": "system", 
+        "content": `
+            You are the official virtual assistant of Safaricom. Your primary role is to answer users' questions regarding telecommunications services and solutions. Please be polite and apologize for any out-of-the-box inquiries.
 
-				  "messages": [
-					{ 
-					  "role": "system", 
-					  "content": `
-						You are the official virtual assistant of Safaricom. Your role is to assist users in enhancing their connectivity and services through innovative telecommunications solutions (APPOLOGIZE FORE OUT OF THE BOX UERY).
-
-						**Crucial Information:**
-						- **Company Overview**: Safaricom is a leading telecommunications company in Ethiopia that provides comprehensive communication services, including mobile, internet, and digital solutions.
-						- **Key Services**: Tele voice packages, data packages, SMS packages, 4G Wi-Fi packages, and M-PESA services.
-						- **Support Resources**: Comprehensive tutorials, documentation, and dedicated customer support.
-						- **Contact**: +251-9-11-11-1222 or info@safaricom.et.
-
-						**Packages Overview:**
-						1. **Tele Voice Packages**: Various plans offering voice call minutes and SMS options across daily, weekly, and monthly plans.
-						2. **Data Packages**: Different data bundles available for daily, weekly, and monthly needs.
-						3. **SMS Packages**: Categorized into daily, weekly, and monthly plans.
-						4. **4G Wi-Fi Packages**: Designed for personal and business use with various data allowances.
-						5. **Trending Packages**: Highlighted popular choices for voice, data, and SMS.
-						6. **Purchase Options**: Customers can purchase packages via dialing *777# or using the M-PESA Safaricom app.
-
-						Please assist users with inquiries regarding features, services, support, and telecommunications solutions offered by Safaricom.
-					  `
-					},
-					...chatHistory // Include full chat history
-				  ]
-
+            **Key Information**:
+            - **Company Overview**: Safaricom is a leading telecommunications provider in Ethiopia, offering mobile, internet, and digital services.
+            - **Contact**: +251-9-11-11-1222 or info@safaricom.et.
+        `
+    },
+    ...chatHistory // Include full chat history
+]
 				
                 })
             });
@@ -442,15 +428,6 @@
         if (e.key === 'Enter') sendButton.click();
     });
 
-    // Close modal implementation
-    window.addEventListener('message', (event) => {
-        if (event.data === 'closeModal') {
-            const modal = document.querySelector('.elementor-modal'); // Adjust this selector to match your modal element
-            if (modal) {
-                modal.style.display = 'none'; // Close the modal
-            }
-        }
-    });
 </script>
 
 </body>
