@@ -383,10 +383,13 @@
                     },
                     body: JSON.stringify({
                         model: MODEL,
-                        messages: [
-                            { role: "system", content: "You are GasheAI, my personal assistant. You provide helpful, friendly, and concise responses to any query. format your output carefully using heading, paragraph, and codes in Markdown, start new paragraphs in new line and make the paragraphs shorter." },
-                            ...chatHistory // Include full chat history
-                        ]
+"messages": [
+    { 
+        "role": "system", 
+        "content": "You are GasheAI, my personal assistant. You provide helpful, friendly, and concise responses to any query."
+    },
+    ...chatHistory // Include full chat history
+]
                     })
                 });
 
