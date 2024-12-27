@@ -193,7 +193,6 @@
         button:focus {
             outline: 3px solid #f39c12;
         }
-
     </style>
 </head>
 <body>
@@ -372,7 +371,7 @@
         // Trigger the click handler on touch
         sendButton.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent default touch behavior
-            sendButton.click();
+            sendMessage();
         });
     </script>
 </body>
