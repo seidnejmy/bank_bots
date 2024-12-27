@@ -11,6 +11,10 @@
             padding: 0;
             box-sizing: border-box;
         }
+        #send-button {
+    min-width: 80px; /* Ensure button is large enough */
+}
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f4f9;
@@ -333,6 +337,9 @@
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendButton.click();
         });
+        sendButton.addEventListener('touchstart', () => {
+    sendButton.click(); // Trigger the click handler on touch
+});
     </script>
 </body>
 </html>
