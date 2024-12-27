@@ -16,6 +16,9 @@
             background-color: #f7f4f9;
             color: #333;
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         /* Sidebar */
@@ -47,6 +50,9 @@
         #main-content {
             margin-left: 250px;
             padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
             transition: margin-left 0.3s ease;
         }
         #main-content.full-width {
@@ -105,6 +111,9 @@
             height: 400px;
             overflow-y: auto;
             margin-bottom: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
         .message {
             margin-bottom: 15px;
@@ -122,6 +131,31 @@
             color: #2c3e50;
             align-self: flex-start;
             max-width: 80%;
+        }
+
+        /* Input area */
+        #input-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #message-input {
+            width: 80%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #send-button {
+            padding: 10px 15px;
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #7a3e8c;
         }
 
         /* Loading Spinner */
@@ -327,24 +361,20 @@
             chatContainer.innerHTML += `<div class="message bot"><strong>Ardi+:</strong> ${aiResponse}</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            // Add AI response to chat history
-            chatHistory.push({ role: "assistant", content: aiResponse });
-
         } catch (error) {
-            console.error('Error:', error);
-            chatContainer.innerHTML += `<div class="message bot"><strong>Ardi+:</strong> Error: ${error.message}</div>`;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            console.error('AI response error:', error);
         }
     }
 
-    // Pressing Enter to Send
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-
-    // Send button click handler
+    // Handle the Send button click
     sendButton.addEventListener('click', sendMessage);
-</script>
 
+    // Handle Enter key in input field
+    messageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
 </body>
 </html>
