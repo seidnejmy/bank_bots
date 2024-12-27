@@ -301,8 +301,8 @@
             });
         });
 
-        // Sending Message to the Bot
-        sendButton.addEventListener('click', async () => {
+        // Function to handle sending messages
+        async function sendMessage() {
             const userMessage = messageInput.value.trim();
             if (!userMessage) return;
 
@@ -354,14 +354,25 @@
                 chatContainer.innerHTML += `<div class="message bot"><strong>Ardi+:</strong> Error: ${error.message}</div>`;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
+        }
+
+        // Sending Message to the Bot
+        sendButton.addEventListener('click', async () => {
+            await sendMessage();
         });
 
         // Pressing Enter to Send
         messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendButton.click();
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent the default action (like a new line)
+                sendMessage();
+            }
         });
-        sendButton.addEventListener('touchstart', () => {
-            sendButton.click(); // Trigger the click handler on touch
+
+        // Trigger the click handler on touch
+        sendButton.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent default touch behavior
+            sendButton.click();
         });
     </script>
 </body>
