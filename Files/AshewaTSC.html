@@ -260,8 +260,8 @@
 <body>
     <div id="sidebar">
         <img src="https://gasheai.nehabi.com/extensions/uploads/sites/561/2024/11/retina-logopng-1.png" alt="Placeholder Photo">
-        <h2>Welcome to GasheAI</h2> <br> <h2>I am vertual assistance of  Ashewa Technology Solutions</h2>
-        <p>Choose your language and enjoy chatting with Ashewa Technoly Assistant</p>
+        <h2>Welcome to GasheAI</h2> <br> <h2>I am Ashewa Technology Solutions virtual assistant</h2>
+        <p>Choose your language and enjoy chatting with Ashewa Technology Solutions Assistant.</p>
     </div>
 
     <div id="main-content">
@@ -382,16 +382,16 @@
                     model: MODEL,
 
 					
-const messages = [
-    { role: "system", content: `
-        You are the official virtual assistant for Ashewa Technology Solutions.
-        ...
-    ` },
-    ...chatHistory
-];
-
-
-		
+				  "messages": [
+					{ 
+					  "role": "system", 
+					  "content": `
+						You are the official virtual assistant of Ashewa Technology Solutions.
+	  `
+					},
+					...chatHistory // Include full chat history
+				  ]
+					
                 })
             });
 
@@ -401,7 +401,7 @@ const messages = [
             let aiResponse = data.choices[0].message.content;
 
             // Format response in Markdown
-            aiResponse = `**Ashewa Assistant:**\n\n${aiResponse.replace(/\n/g, '\n\n')}`;
+            aiResponse = `**Ashewa Technology Solutions:**\n\n${aiResponse.replace(/\n/g, '\n\n')}`;
 
             // Translate AI response to current language
             aiResponse = await translateText(aiResponse, currentLanguage);
@@ -423,6 +423,16 @@ const messages = [
     // Allow "Enter" to send the message
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendButton.click();
+    });
+
+    // Close modal implementation
+    window.addEventListener('message', (event) => {
+        if (event.data === 'closeModal') {
+            const modal = document.querySelector('.elementor-modal'); // Adjust this selector to match your modal element
+            if (modal) {
+                modal.style.display = 'none'; // Close the modal
+            }
+        }
     });
 </script>
 
