@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with GasheAI</title>
+    <title>Chat with Ardi+</title>
     <style>
         /* Basic Reset */
         * {
@@ -172,7 +172,7 @@
 <body>
     <div id="sidebar">
         <img src="https://gasheai.nehabi.com/extensions/uploads/sites/561/2024/11/retina-logopng-1.png" alt="Placeholder Photo">
-        <h2>Welcome to GasheAI</h2>
+        <h2>Welcome to Ardi+</h2>
         <h2>I am Ardi+, virtual assistant of Ethio Telecom</h2>
         <p>Choose your language and enjoy chatting with Ardi+.</p>
     </div>
@@ -267,7 +267,7 @@
 
                 chatContainer.innerHTML += `
                     <div class="message bot">
-                        Language switched to ${event.target.textContent}.
+                        Ardi+: Language switched to ${event.target.textContent}.
                     </div>
                 `;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -280,7 +280,7 @@
             if (!userMessage) return;
 
             // Display user message
-            chatContainer.innerHTML += `<div class="message user">${userMessage}</div>`;
+            chatContainer.innerHTML += `<div class="message user"><strong>Visitor:</strong> ${userMessage}</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
             messageInput.value = '';
 
@@ -300,7 +300,7 @@
                         messages: [
                             { 
                                 role: "system", 
-                                content: `You are the official virtual assistant of Ethio Telecom. Your role is to assist users in a direct and friendly manner.` 
+                                content: `You are Ardi+, the official virtual assistant of Ethio Telecom. Your role is to assist users in a direct and friendly manner.` 
                             },
                             ...chatHistory
                         ]
@@ -318,13 +318,13 @@
                 aiResponse = await translateText(aiResponse, currentLanguage);
 
                 // Display AI response
-                chatContainer.innerHTML += `<div class="message bot">${aiResponse}</div>`;
+                chatContainer.innerHTML += `<div class="message bot"><strong>Ardi+:</strong> ${aiResponse}</div>`;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
 
                 chatHistory.push({ role: "assistant", content: aiResponse });
             } catch (error) {
                 console.error('Error:', error);
-                chatContainer.innerHTML += `<div class="message bot">Error: ${error.message}</div>`;
+                chatContainer.innerHTML += `<div class="message bot"><strong>Ardi+:</strong> Error: ${error.message}</div>`;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
         });
