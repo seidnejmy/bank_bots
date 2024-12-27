@@ -382,20 +382,21 @@
                     model: MODEL,
 
 					
-messages: [
+const messages = [
     { 
         role: "system", 
         content: `
-            You are the official virtual assistant for Ashewa Technology Solutionst.
+            You are the official virtual assistant for Ashewa Technology Solutions.
 
             **Overview**:
             - **Services**: Smart ERP, e-commerce, app development, digital marketing, cloud services, domain hosting.
             - **Support**: Tutorials, documentation, and dedicated customer support.
             - **Contact**: +251-9-46-43-3333 or info@ashewa.com.
-
+        `
     },
-    ...chatHistory // Include full chat history
-]
+    ...chatHistory // Ensure chatHistory is a valid array
+];
+
 		
                 })
             });
