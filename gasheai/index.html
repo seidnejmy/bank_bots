@@ -73,6 +73,8 @@
             color: white;
             border-radius: 5px;
             cursor: pointer;
+            display: inline-block;
+            width: auto;
         }
         #header-buttons button:hover {
             background-color: #c0392b;
@@ -205,6 +207,15 @@
             #sidebar.show {
                 transform: translateX(0);
             }
+
+            /* Adjust buttons on mobile */
+            #header-buttons button,
+            #input-area button,
+            #language-buttons button {
+                width: 100%; /* Make buttons take full width on small screens */
+                margin-bottom: 10px; /* Add spacing between buttons */
+                padding: 15px; /* Make buttons larger for easier touch on mobile */
+            }
         }
     </style>
 </head>
@@ -213,7 +224,6 @@
         <img src="https://gasheai.nehabi.com/extensions/uploads/sites/561/2024/11/retina-logopng-1.png" alt="Placeholder Photo">
         <h2>Welcome to Ardi+</h2>
         <p>Choose your language and enjoy chatting with Ardi+.</p>
-        <button id="toggle-sidebar" aria-label="Toggle Sidebar">Toggle Sidebar</button>
     </div>
 
     <div id="main-content">
@@ -247,20 +257,14 @@
     const darkModeToggle = document.getElementById('dark-mode-toggle');
     const newChatButton = document.getElementById('new-chat-button');
     const backButton = document.getElementById('back-button');
-    const sidebar = document.getElementById('sidebar');
-    const toggleSidebar = document.getElementById('toggle-sidebar');
 
     let currentLanguage = 'en';
     let isDarkMode = false;
     const API_KEY = "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"; 
     const MODEL = "llama3-groq-70b-8192-tool-use-preview";
     const TRANSLATION_API_URL = "https://translate.googleapis.com/translate_a/single";
-    let chatHistory = [];
 
-    // Toggle Sidebar for Mobile
-    toggleSidebar.addEventListener('click', () => {
-        sidebar.classList.toggle('hide');
-    });
+    let chatHistory = [];
 
     // Toggle Dark Mode
     darkModeToggle.addEventListener('click', () => {
@@ -278,12 +282,7 @@
 
     // Handle Back Button
     backButton.addEventListener('click', () => {
-        const isInIframe = window.top !== window.self;
-        if (isInIframe) {
-            window.top.postMessage('closeModal', '*');
-        } else {
-            window.location.href = 'https://gasheai.nehabi.com/';
-        }
+        window.history.back(); // Go back to the previous page
     });
 
     // Translate Text
@@ -310,9 +309,11 @@
             languageButtons.forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
-            chatContainer.innerHTML += `<div class="message bot">
+            chatContainer.innerHTML += ` 
+                <div class="message bot">
                     Ardi+: Language switched to ${event.target.textContent}.
-                </div>`;
+                </div>
+            `;
             chatContainer.scrollTop = chatContainer.scrollHeight;
         });
     });
@@ -344,7 +345,7 @@
                     messages: [
                         { 
                             role: "system", 
-                            content: "You are Ardi+, the official virtual assistant of Ethio Telecom. Your role is to assist users in a direct and friendly manner." 
+                            content: `You are Ardi+, the official virtual assistant of Ethio Telecom. Your role is to assist users in a direct and friendly manner.` 
                         },
                         ...chatHistory
                     ]
@@ -367,17 +368,14 @@
 
         } catch (error) {
             console.error('AI response error:', error);
+            chatContainer.innerHTML += `<div class="message bot"><strong>Ardi+:</strong> Sorry, there was an error processing your request.</div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
     }
 
-    // Handle the Send button click
     sendButton.addEventListener('click', sendMessage);
-
-    // Handle Enter key in input field
-    messageInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
+    messageInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') sendMessage();
     });
 </script>
 </body>
