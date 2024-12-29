@@ -256,7 +256,7 @@
     let currentLanguage = 'en';
     let isDarkMode = false;
     const API_KEY = "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"; 
-    const MODEL = "llama3-groq-70b-8192-tool-use-preview";
+    const MODEL = "llama3-70b-8192";
     const TRANSLATION_API_URL = "https://translate.googleapis.com/translate_a/single";
 
     let chatHistory = [];
@@ -507,7 +507,7 @@ const combinedJson = {
                     messages: [
                         { 
                             role: "system", 
-                            content: `You are NehabiBot, the official virtual assistant of nehabi.com. Your role is to assist users in a friendly manner, respond in plain text, and do not call any function instead respond directly to the user. Use the following information about our website, services, and plans to answer users' questions.` 
+                            content: `You are NehabiBot, the official virtual assistant of nehabi.com. Your role is to assist users in a friendly manner, respond in plain text, and do not call any function instead respond directly to the user. Use the following information about our website, services, and plans to answer users' questions. Whenever you are unsure to reapond, never say i dont knoe, instead give them the contact and telegram details.` 
                         },
                         { 
                             role: "system", 
