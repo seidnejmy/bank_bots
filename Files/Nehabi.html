@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with Nehabi Assistant</title>
+    <title>Chat with NehabiBot</title>
     <style>
         /* Basic Reset */
         * {
@@ -16,6 +17,9 @@
             background-color: #f7f4f9;
             color: #333;
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
 
         /* Sidebar */
@@ -30,6 +34,7 @@
             color: white;
             text-align: center;
             box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
         }
         #sidebar h2, #sidebar p {
             color: white;
@@ -38,11 +43,21 @@
             max-width: 80%;
             margin-bottom: 20px;
         }
+        #sidebar.hide {
+            transform: translateX(-100%);
+        }
 
         /* Main content area */
         #main-content {
             margin-left: 250px;
             padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+        #main-content.full-width {
+            margin-left: 0;
         }
 
         /* Header Buttons */
@@ -97,6 +112,9 @@
             height: 400px;
             overflow-y: auto;
             margin-bottom: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
         .message {
             margin-bottom: 15px;
@@ -116,31 +134,43 @@
             max-width: 80%;
         }
 
-        /* Input Area */
+        /* Input area */
         #input-area {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            align-items: center;
         }
         #message-input {
-            width: 85%;
+            width: 80%;
             padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
+            font-size: 14px;
+            border: 1px solid #ccc;
             border-radius: 5px;
         }
         #send-button {
-            width: 12%;
-            padding: 10px;
-            background-color: #f39c12;
+            padding: 10px 15px;
+            background-color: #8e44ad;
             color: white;
-            font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
         #send-button:hover {
-            background-color: #e67e22;
+            background-color: #7a3e8c;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #8e44ad;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Dark Mode */
@@ -157,14 +187,24 @@
         .dark-mode #chat-container {
             background-color: #34495e;
         }
+        .dark-mode #language-buttons button {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+        .dark-mode #send-button {
+            background-color: #f39c12;
+        }
 
-        /* Hide Sidebar on Mobile Devices */
+        /* Responsive Design */
         @media screen and (max-width: 768px) {
             #sidebar {
-                display: none;
+                transform: translateX(-100%);
             }
             #main-content {
                 margin-left: 0;
+            }
+            #sidebar.show {
+                transform: translateX(0);
             }
         }
     </style>
@@ -172,9 +212,9 @@
 <body>
     <div id="sidebar">
         <img src="https://gasheai.nehabi.com/extensions/uploads/sites/561/2024/11/retina-logopng-1.png" alt="Placeholder Photo">
-        <h2>Welcome to Nehabi</h2>
-        <h2>I am virtual assistant of Nehabi</h2>
-        <p>Choose your language and enjoy chatting with Nehabi Assistant.</p>
+        <h2>Welcome to GasheAI</h2>
+        <p>Choose your language and enjoy chatting with NehabiBot.</p>
+        <button id="toggle-sidebar" aria-label="Toggle Sidebar">Toggle Sidebar</button>
     </div>
 
     <div id="main-content">
@@ -200,194 +240,312 @@
         </div>
     </div>
 
-    <script>
-        const chatContainer = document.getElementById('chat-container');
-        const messageInput = document.getElementById('message-input');
-        const sendButton = document.getElementById('send-button');
-        const languageButtons = document.querySelectorAll('#language-buttons button');
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        const newChatButton = document.getElementById('new-chat-button');
-        const backButton = document.getElementById('back-button');
 
-        let currentLanguage = 'en';
-        let isDarkMode = false;
-        const API_KEY = "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"; 
-        const MODEL = "llama3-groq-70b-8192-tool-use-preview";
-        const TRANSLATION_API_URL = "https://translate.googleapis.com/translate_a/single";
-
-        let chatHistory = [];
-
-        // Toggle Dark Mode
-        darkModeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            isDarkMode = !isDarkMode;
-            darkModeToggle.textContent = isDarkMode ? 'Disable Dark Mode' : 'Enable Dark Mode';
-        });
-
-        // Start a New Chat
-        newChatButton.addEventListener('click', () => {
-            chatContainer.innerHTML = '';
-            messageInput.value = '';
-            chatHistory = [];
-        });
-
-        // Handle Back Button
-        backButton.addEventListener('click', () => {
-            const isInIframe = window.top !== window.self;
-            if (isInIframe) {
-                window.top.postMessage('closeModal', '*');
-            } else {
-                window.location.href = 'https://gasheai.nehabi.com/';
-            }
-        });
-
-        // Translate Text
-        async function translateText(text, targetLang) {
-            if (targetLang === 'en') return text; // Skip translation if English
-
-            const url = `${TRANSLATION_API_URL}?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Translation API error: ' + response.statusText);
-
-                const data = await response.json();
-                return data[0].map(part => part[0]).join('');
-            } catch (error) {
-                console.error('Translation error:', error);
-                return text; // Return original text if translation fails
-            }
-        }
-
-        // Language Switching
-        languageButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                currentLanguage = event.target.id.split('-')[0];
-                languageButtons.forEach(btn => btn.classList.remove('active'));
-                event.target.classList.add('active');
-
-                chatContainer.innerHTML += `
-                    <div class="message bot">
-                        Nehabi Assistant: Language switched to ${event.target.textContent}.
-                    </div>
-                `;
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            });
-        });
-
-        // Sending Message to the Bot
-        sendButton.addEventListener('click', async () => {
-            const userMessage = messageInput.value.trim();
-            if (!userMessage) return;
-
-            // Display user message
-            chatContainer.innerHTML += `<div class="message user"><strong>Visitor:</strong> ${userMessage}</div>`;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            messageInput.value = '';
-
-            // Translate message to English for AI
-            const translatedMessage = await translateText(userMessage, 'en');
-            chatHistory.push({ role: "user", content: translatedMessage });
-
-            try {
-                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: MODEL,
-                        messages: [
-                            { 
-                                role: "system", 
-                                content: `You are the official assitant of Nehabi (nehabi.com website platform). Your role is to assist visitors in a direct and friendly manner.Do not Call any function or respond in any JSON format, just respond with plain text directly.
-                                Website Creation Options:
-- Nehabi supports various website types like eCommerce, blogs, and professional sites.
-- Users can choose from over 200 customizable templates.
-
-User-Friendly Editor:
-- The platform features an intuitive drag-and-drop editor for easy customization.
-- No coding skills are required to build a website.
-
-Fast Development Process:
-- Build and launch a fully functional website within minutes.
-- Accelerated site creation ensures professional results quickly.
-
-Cost-Effective Solutions:
-- Nehabi offers budget-friendly pricing plans for small businesses.
-- High-quality features provided at a fraction of typical costs.
-
-SEO and Analytics Integration:
-- Built-in SEO tools help improve search engine visibility.
-- Integrated analytics provide insights to enhance online performance.
-
-Versatile Features:
-- Supports various customizable elements like text, images, and videos.
-- Includes eCommerce functionalities like shopping carts and payment gateways.
-
-Comprehensive Support and Resources:
-- Users have access to a variety of learning resources and documentation.
-- Customer support is available for assistance during website creation.
-
-Website Creation Types:
-- Users can create various types of websites including eCommerce, blogs, and more.
-- Nehabi offers over 200 customizable templates for diverse industries.
-
-User-Friendly Editor:
-- The platform features a simple drag-and-drop editor, requiring no coding skills.
-- Users can easily customize their content to match their vision.
-
-Fast Deployment:
-- Websites can be built and launched quickly, allowing users to go live in minutes.
-- Rapid development benefits small businesses needing to establish an online presence.
-
-Cost Efficiency:
-- Nehabi provides budget-friendly pricing plans suitable for startups and small businesses.
-- High-quality features are offered at competitive prices.
-
-SEO and Analytics:
-- Built-in SEO tools are available to enhance online visibility.
-- Integrated analytics helps track performance and optimize future efforts.
-
-Comprehensive Features:
-- Nehabi includes eCommerce integration, managed hosting, and domain management.
-- Users can generate dynamic QR codes and utilize customizable elements.
-
-Learning and Support Resources:
-- Numerous resources, including tutorials and documentation, are provided for users.
-- Support ensures users can maximize the potential of their websites.` 
-                            },
-                            ...chatHistory
-                        ]
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Network error: ' + response.statusText);
-                }
-
-                const data = await response.json();
-                let aiResponse = data.choices[0]?.message?.content || "Sorry, I couldn't understand that.";
-
-                // Translate AI response to current language
-                aiResponse = await translateText(aiResponse, currentLanguage);
-
-                // Display AI response
-                chatContainer.innerHTML += `<div class="message bot"><strong>Nehabi Assistant:</strong> ${aiResponse}</div>`;
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-
-                chatHistory.push({ role: "assistant", content: aiResponse });
-            } catch (error) {
-                console.error('Error:', error);
-                chatContainer.innerHTML += `<div class="message bot"><strong>Nehabi Assistant:</strong> Error: ${error.message}</div>`;
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-        });
-
-        // Pressing Enter to Send
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendButton.click();
-        });
-    </script>
 </body>
 </html>
+
+<script>
+    const chatContainer = document.getElementById('chat-container');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const languageButtons = document.querySelectorAll('#language-buttons button');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const newChatButton = document.getElementById('new-chat-button');
+    const backButton = document.getElementById('back-button');
+
+    let currentLanguage = 'en';
+    let isDarkMode = false;
+    const API_KEY = "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"; 
+    const MODEL = "llama3-groq-70b-8192-tool-use-preview";
+    const TRANSLATION_API_URL = "https://translate.googleapis.com/translate_a/single";
+
+    let chatHistory = [];
+
+    // Toggle Dark Mode
+    darkModeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        isDarkMode = !isDarkMode;
+        darkModeToggle.textContent = isDarkMode ? 'Disable Dark Mode' : 'Enable Dark Mode';
+    });
+
+    // Start a New Chat
+    newChatButton.addEventListener('click', () => {
+        chatContainer.innerHTML = '';
+        messageInput.value = '';
+        chatHistory = [];
+    });
+
+    // Handle Back Button
+    backButton.addEventListener('click', () => {
+        const isInIframe = window.top !== window.self;
+        if (isInIframe) {
+            window.top.postMessage('closeModal', '*');
+        } else {
+            window.location.href = 'https://gasheai.nehabi.com/';
+        }
+    });
+
+    // Translate Text
+    async function translateText(text, targetLang) {
+        if (targetLang === 'en') return text; // Skip translation if English
+
+        const url = `${TRANSLATION_API_URL}?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Translation API error: ' + response.statusText);
+
+            const data = await response.json();
+            return data[0].map(part => part[0]).join(''); // Return translated text
+        } catch (error) {
+            console.error('Translation error:', error);
+            return text; // Return original text if translation fails
+        }
+    }
+
+    // Language Switching
+    languageButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            currentLanguage = event.target.id.split('-')[0];
+            languageButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            chatContainer.innerHTML += ` 
+                <div class="message bot">
+                    NehabiBot: Language switched to ${event.target.textContent}.
+                </div>
+            `;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        });
+    });
+
+    // Check if user is asking about supported languages
+    function checkLanguageQuery(userMessage) {
+        const supportedLanguages = ['Amharic', 'Oromo', 'Somali', 'Afar'];
+        const lowercasedMessage = userMessage.toLowerCase();
+        return supportedLanguages.some(language => lowercasedMessage.includes(language.toLowerCase()));
+    }
+
+    // Extracted Send Message Logic
+    async function sendMessage() {
+        const userMessage = messageInput.value.trim();
+        if (!userMessage) return;
+
+        // If user asks about supported languages
+        if (checkLanguageQuery(userMessage)) {
+            chatContainer.innerHTML += `<div class="message bot"><strong>NehabiBot:</strong> Yes, but you should first click the button to your desired language.</div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            messageInput.value = ''; // Clear input
+            return;
+        }
+
+        // Display user message immediately
+        chatContainer.innerHTML += `<div class="message user"><strong>Visitor:</strong> ${userMessage}</div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to latest message
+        messageInput.value = ''; // Clear input
+
+        // Translate message to English for AI processing
+        const translatedMessage = await translateText(userMessage, 'en');
+        chatHistory.push({ role: "user", content: translatedMessage });
+
+ // Define combined JSON data with updated content
+const combinedJson = {
+    "website": {
+        "name": "Nehabi",
+        "description": "Nehabi allows businesses to create professional, responsive, and visually appealing websites without any coding.",
+        "address": {
+            "street": "Bole Reality Building, 9th floor",
+            "city": "Addis Ababa",
+            "country": "Ethiopia"
+        },
+        "contact": {
+            "phone_numbers": [
+                "+251-909-70-7870",
+                "+251-909-70-7880"
+            ],
+            "email": "nehabi@ashewa.com"
+        },
+        "features": {
+            "easy_editor": "Effortlessly create and edit your site with a user-friendly drag and drop editor.",
+            "fast_creation": "Build a fully functional website in minutes.",
+            "cost_effective": "Budget-friendly pricing plans with high-quality features.",
+            "seo_integration": "Built-in SEO tools and integrated analytics.",
+            "customizable_templates": "Offers over 200 templates across various industries.",
+            "ecommerce_integration": "Features for product catalogs, shopping carts, payment gateways, and order management.",
+            "hosting_management": "Integrated hosting solutions and domain management.",
+            "qr_code_generator": "Create and manage dynamic QR codes.",
+            "mobile_access": "Administer your business through a mobile dashboard.",
+            "lead_capture_and_reports": "Capture leads and receive reports and insights."
+        },
+        "website_creation_steps": [
+            "REGISTER - Buy a package and register.",
+            "SELECT - Choose the type of website you wish to create.",
+            "CUSTOMIZE - Edit your template with design features.",
+            "PUBLISH - Hit publish to go live."
+        ],
+        "industries_supported": [
+            "eCommerce",
+            "Restaurant",
+            "Blogging",
+            "Beauty & Salon",
+            "Professional Services",
+            "Learning LMS",
+            "Charity",
+            "Corporate"
+        ],
+        "social_media": [
+            "https://facebook.com/nehabi",
+			"https://t.me/nehabi",
+	        "https://tiktok.com/@nehabi",
+			"https://youtube.com/nehabi",
+			"https://instagram.com/nehabi",
+			"https://linkedin.com/company/nehabi"
+        ],		
+        "faq": [
+            {
+                "question": "What is expected from me to start over?",
+                "answer": "Specify your demand based on your company business requirements and select a site builder plan."
+            },
+            {
+                "question": "How much time does it take to host my website?",
+                "answer": "Less than an hour to create your domain and start building."
+            },
+            {
+                "question": "Which services are included?",
+                "answer": "All-in-one website builder solutions, including email, server cost, domain cost, SSL certificates, templates, and support."
+            },
+            {
+                "question": "How much does it cost to host my website on Ashewa Cloud?",
+                "answer": "Prices depend on the selected package; Nehabi is one of the most affordable options in Ethiopia."
+            },
+            {
+                "question": "How to get started to have my own website?",
+                "answer": "Click on Create, fill necessary information, and confirm your identity."
+            },
+            {
+                "question": "What resources are available to learn how to use Nehabi?",
+                "answer": "Documentation, tutorials, video guides, and a knowledge base."
+            }
+        ],
+        "company": {
+            "name": "Ashewa Technology Solutions SC",
+            "website": "https://ashewa.com"
+        }
+    },
+    "company": {
+        "name": "Nehabi",
+        "address": "Bole Reality Building 9th floor, Addis Ababa, Ethiopia",
+        "contact": {
+            "phone": [
+                "+251-909-70-7870",
+                "+251-909-70-7880"
+            ],
+            "email": "nehabi@ashewa.com"
+        },
+        "website": "https://nehabi.com"
+    },
+    "plans": [
+        {
+            "name": "Professional Plan",
+            "annual_fee": "ETB 10,000",
+            "setup_fee": "ETB 2,500",
+            "features": {
+                "target_audience": "Small Teams, Profiles, and Portfolios",
+                "web_pages": "<= 50",
+                "ecommerce": false,
+                "products": 0,
+                "disk_space": "6 GB",
+                "bandwidth": "Unlimited",
+                "blog_news": "Unlimited",
+                "gallery_media": "Unlimited",
+                "custom_domain": "Free for 1 year"
+            }
+        },
+        {
+            "name": "Premium Plan",
+            "annual_fee": "ETB 20,000",
+            "setup_fee": "ETB 2,500",
+            "features": {
+                "target_audience": "Professionals and Growing Companies",
+                "web_pages": "<= 150",
+                "ecommerce": true,
+                "products": 280,
+                "disk_space": "11 GB",
+                "bandwidth": "Unlimited",
+                "blog_news": "Unlimited",
+                "gallery_media": "Unlimited",
+                "custom_domain": "Free for 1 year"
+            }
+        },
+        {
+            "name": "Business Plan",
+            "annual_fee": "ETB 62,500",
+            "setup_fee": "ETB 2,500",
+            "features": {
+                "target_audience": "Large Projects and Enterprises",
+                "web_pages": "<= 300",
+                "ecommerce": true,
+                "products": 500,
+                "disk_space": "35 GB",
+                "bandwidth": "Unlimited",
+                "blog_news": "Unlimited",
+                "gallery_media": "Unlimited",
+                "custom_domain": "Free for 1 year"
+            }
+        }
+    ]
+};
+        try {
+            // Send message to AI model for a response, with the combined JSON added as context
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: MODEL,
+                    messages: [
+                        { 
+                            role: "system", 
+                            content: `You are NehabiBot, the official virtual assistant of nehabi.com. Your role is to assist users in a friendly manner, respond in plain text, and do not call any function instead respond directly to the user. Use the following information about our website, services, and plans to answer users' questions.` 
+                        },
+                        { 
+                            role: "system", 
+                            content: JSON.stringify(combinedJson)
+                        },
+                        ...chatHistory
+                    ]
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network error: ' + response.statusText);
+            }
+
+            const data = await response.json();
+            let aiResponse = data.choices[0]?.message?.content || "Sorry, I couldn't understand that.";
+
+            // Translate AI response back to the selected language
+            aiResponse = await translateText(aiResponse, currentLanguage);
+
+            // Display AI response
+            chatContainer.innerHTML += `<div class="message bot"><strong>NehabiBot:</strong> ${aiResponse}</div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        } catch (error) {
+            console.error('AI response error:', error);
+        }
+    }
+
+    // Event listener for send button
+    sendButton.addEventListener('click', sendMessage);
+
+    // Event listener for Enter key (send message)
+    messageInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) { // Send on Enter key without Shift
+            event.preventDefault(); // Prevent the default Enter key action (new line)
+            sendMessage();
+        }
+    });
+</script>
+
